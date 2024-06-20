@@ -1,9 +1,7 @@
 package org.example;
 
 import io.restassured.response.ValidatableResponse;
-import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 

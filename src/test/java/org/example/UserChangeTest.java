@@ -1,19 +1,31 @@
 package org.example;
 
 import io.restassured.response.ValidatableResponse;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class UserChangeTest {
 
     private final UserClient client = new UserClient();
+    private final UserCreateChecks check = new UserCreateChecks();
     private final UserCreateChecks createChecks = new UserCreateChecks();
     private final UserChangeChecks changeChecks = new UserChangeChecks();
+    private User user;
+    private void randomUser() {
+        user = User.random();
+    }
+    @After
+    public void deleteUser() {
+        ValidatableResponse loginResponse = client.loginUser(UserLoginCredentials.from(user));
+        String token = check.loginInSuccessfully(loginResponse);
+        client.deleteUser(UserCredentials.from(user), token);
+    }
 
 
     @Test
     public void GetUserCheckStatus() {
-        var user = User.random();
+        randomUser();
         ValidatableResponse createResponse = client.createUser(user);
         createChecks.createdSuccessfully(createResponse);
 
@@ -31,18 +43,19 @@ public class UserChangeTest {
 
     @Test
     public void ChangeUserSuccess() {
-        var user = User.random();
-
+        randomUser();
         ValidatableResponse createResponse = client.createUser(user);
         createChecks.createdSuccessfully(createResponse);
 
-        var credentials = UserLoginCredentials.from(user);
-        ValidatableResponse loginResponse = client.loginUser(credentials);
+        var loginCredentials = UserLoginCredentials.from(user);
+        ValidatableResponse loginResponse = client.loginUser(loginCredentials);
 
         String token = createChecks.loginInSuccessfully(loginResponse);
 
-        var userCheck = User.random();
-        var userCredentials = new UserCredentials(userCheck.getName(), userCheck.getEmail());
+        randomUser();
+        user.setPassword(loginCredentials.getPassword());
+
+        var userCredentials = UserCredentials.from(user);
         ValidatableResponse getClientResponse = client.changeUser(userCredentials, token);
 
         var getUserResponse = changeChecks.ChangeUserSuccess(getClientResponse);
@@ -53,7 +66,7 @@ public class UserChangeTest {
 
     @Test
     public void ChangeUserFailed() {
-        var user = User.random();
+        randomUser();
 
         ValidatableResponse createResponse = client.createUser(user);
         createChecks.createdSuccessfully(createResponse);

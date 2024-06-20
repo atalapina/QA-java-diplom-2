@@ -1,10 +1,7 @@
 package org.example;
 import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
-import org.junit.Test;
-
 import java.net.HttpURLConnection;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 public class UserCreateChecks {
@@ -55,15 +52,7 @@ public class UserCreateChecks {
                 .path("message");
         assertEquals(message, "email or password are incorrect");
     }
-    @Step("delete user success")
-    public void checkDeleteUser(ValidatableResponse deleteUser) {
-        boolean delete = deleteUser
-                .assertThat()
-                .statusCode(HttpURLConnection.HTTP_ACCEPTED)
-                .extract()
-                .path("success");
-        assertTrue(delete);
-    }
+
     @Step("check user order list successfully")
     public void getOrderClientSuccessfully(ValidatableResponse createResponse) {
         boolean created = createResponse
